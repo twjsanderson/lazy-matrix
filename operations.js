@@ -1,5 +1,5 @@
 import * as math from 'mathjs';
-import { isObj, isSafeBigInt, isSafeFloat, isSafeNumber, isMap, isFloat } from './utils';
+import { isObj, isSafeBigInt, isSafeFloat, isSafeNumber, isMap } from './utils';
 
 export const mathOperation = (a, b, type) => {
     if (a === null || b === null) throw Error('Unable to perform math operation on null value')
@@ -15,12 +15,15 @@ export const mathOperation = (a, b, type) => {
     let result = 0;
 
     switch (true) {
-        case isObj(a) && isObj(b):                       // BigInt - BigInt
+        case isObj(a) && isObj(b): {
+            // BigInt - BigInt
             if (isSafeBigInt(a.num) && isSafeBigInt(b.num)) {            
                 result = operation(a.num, b.num);
                 break;
-            }                     
-        case isObj(a) && !isObj(b):
+            }      
+            break;   
+        }            
+        case isObj(a) && !isObj(b): {
             const bValue = isSafeFloat(b) ? Math.floor(b) : 
                 isObj(b) ? b.num : b;
             if (isSafeBigInt(a.num)) {
@@ -30,7 +33,9 @@ export const mathOperation = (a, b, type) => {
                 );
                 break;         
             }         
-        case !isObj(a) && isObj(b):
+            break;
+        }
+        case !isObj(a) && isObj(b): {
             const aValue = isSafeFloat(a) ? Math.floor(a) : 
                 isObj(a) ? a.num : a;   
             if (isSafeBigInt(b.num)) {
@@ -40,8 +45,12 @@ export const mathOperation = (a, b, type) => {
                 );
                 break;
             }
-        default:                                              
-            result = operation(a, b);                         
+            break;
+        }
+        default: {                                           
+            result = operation(a, b);
+            break;
+        }                       
     }
     const isSafeType = isSafeNumber(result) || isSafeBigInt(result) || isSafeFloat(result);
     if (!isSafeType) throw Error(`Math operation result must be a safe number, float or BigInt`);

@@ -9,6 +9,7 @@ import {
     isEqualMatrix,
     getByOperator,
     getMean,
+    findByValue,
 } from './operations';
 import { 
     isArray, 
@@ -78,13 +79,11 @@ export const Matrix = (r, c) => {
     const rows = setRows(r);
     const cols = setCols(c, rows);
     const matrix = setMatrix(rows, cols);
-
     const properties = { rows, cols, matrix };
     const functions = { 
         set: (row, col, value) => setValue(matrix, row, col, value),
         delete: (row, col) => deleteValue(matrix, row, col),
         get: (row, col) => getValue(matrix, row, col),
-        
         size: () => getMatrixSize(matrix),
         isSquare: () => getIsSquare(rows, cols),
         equals: (m2) =>  isEqualMatrix(matrix, m2),
@@ -92,21 +91,17 @@ export const Matrix = (r, c) => {
         min: () => getByOperator(matrix, 'MIN'),
         max: () => getByOperator(matrix, 'MAX'),
         mean: (axis, index) => getMean(matrix, axis, index),
-
         transpose: () => matrixTranspose(matrix, rows),
         determinant: () => matrixDeterminant(matrix, rows, cols),
         cofactor: () => matrixCofactor(matrix, rows, cols),
         inverse: (adjugate, determinant) => matrixInverse(adjugate, determinant),
-
         multiplyBy: (scalar) => transformByScalar(matrix, scalar, 'MULTIPLY'),
         divideBy: (scalar) => transformByScalar(matrix, scalar, 'DIVIDE'),
         addBy: (scalar) => transformByScalar(matrix, scalar, 'ADD'),
         subtractBy: (scalar) => transformByScalar(matrix, scalar, 'SUBTRACT'),
         moduloBy: (scalar) => transformByScalar(matrix, scalar, 'MOD'),
-
         multiply: (m2) => matrixMultiply(matrix, m2.matrix, rows, m2.cols),
         divide: (m2) => matrixDivide(matrix, m2.matrix, { rows, cols }, { rows: m2.rows, cols: m2.cols }),
-
     };
     return Object.assign(properties, functions);
 };

@@ -1,8 +1,4 @@
-import {
-    SAFE_MATRIX_SIZE,
-    MAX_SAFE_BIGINT, 
-    MIN_SAFE_BIGINT,
-} from '../constants';
+import { describe, test, expect } from 'jest';
 import { Matrix } from '../matrix';
 import {
     mathOperation,

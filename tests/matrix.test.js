@@ -1,7 +1,7 @@
+import { describe, test, expect } from 'jest';
 import {
     SAFE_MATRIX_SIZE,
-    MAX_SAFE_BIGINT, 
-    MIN_SAFE_BIGINT,
+    MAX_SAFE_BIGINT,
 } from '../constants';
 import {
     setMatrix,
@@ -433,7 +433,7 @@ describe('Matrix function', () => {
         expect(m).toHaveProperty('cols');
         for (const func of functionNames) {
             expect(m).toHaveProperty(func);
-            expect(m.hasOwnProperty(func)).toBe(true);
+            expect(Object.prototype.hasOwnProperty.call(m, func)).toBe(true);
             expect(m[func]).toBeInstanceOf(Function);
         }
     });

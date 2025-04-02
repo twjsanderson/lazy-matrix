@@ -33,9 +33,10 @@ describe('isObj function', () => {
         expect(isObj(new Map())).toBe(false);
         expect(isObj(new Set())).toBe(false);
         expect(isObj(Object.create(null))).toBe(false);
+        expect(isObj(0.43782642)).toBe(false);
     })
     test('Should return true when input is an Object', () => {
-        expect(isObj({})).toBe(true);
+        expect(isObj({ num: 43782642n, denom: 1n })).toBe(true);
         expect(isObj({test: 123})).toBe(true);
         expect(isObj({test: [1,2,3]})).toBe(true);
         expect(isObj({test: 'test'})).toBe(true);

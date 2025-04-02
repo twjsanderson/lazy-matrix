@@ -7,8 +7,7 @@ import {
     matrixInverse,
     transformByScalar,
     isEqualMatrix,
-    getMin,
-    getMax,
+    getByOperator,
     getMean,
 } from './operations';
 import { 
@@ -107,7 +106,6 @@ export const Matrix = (r, c) => {
 
         multiply: (m2) => matrixMultiply(matrix, m2.matrix, rows, m2.cols),
         divide: (m2) => matrixDivide(matrix, m2.matrix, { rows, cols }, { rows: m2.rows, cols: m2.cols }),
-        
 
     };
     return Object.assign(properties, functions);

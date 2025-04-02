@@ -1,4 +1,5 @@
-import { isObj, isSafeBigInt, isSafeFloat, isSafeNumber, isMap } from './utils';
+import * as math from 'mathjs';
+import { isObj, isSafeBigInt, isSafeFloat, isSafeNumber, isMap, isFloat } from './utils';
 
 export const mathOperation = (a, b, type) => {
     if (a === null || b === null) throw Error('Unable to perform math operation on null value')
@@ -9,28 +10,38 @@ export const mathOperation = (a, b, type) => {
         'DIVIDE': (a, b) => a / b, 
         'MOD': (a, b) => a % b
     };
-    const op = operations[type];
+    const operation = operations[type];
+    const divide = operations['DIVIDE'];
     let result = 0;
+
     switch (true) {
-        case isObj(a) && isObj(b):                              // BigInt - BigInt
+        case isObj(a) && isObj(b):                       // BigInt - BigInt
             if (isSafeBigInt(a.num) && isSafeBigInt(b.num)) {            
-                result = op(a.num, b.num);
+                result = operation(a.num, b.num);
                 break;
             }                     
-        case isObj(a) && !isObj(b):                             // BigInt - Number | Float
-            const bInt = isSafeFloat(b) ? Math.round(b) : b;    // round value because unable to operate float vs BigInt
+        case isObj(a) && !isObj(b):
+            const bValue = isSafeFloat(b) ? Math.floor(b) : 
+                isObj(b) ? b.num : b;
             if (isSafeBigInt(a.num)) {
-                result = op(a.num, BigInt(bInt)) / a.denom;
+                result = divide(
+                    operation(a.num, BigInt(bValue)), 
+                    a.denom
+                );
                 break;         
             }         
-        case !isObj(a) && isObj(b):                             // Number | Float - BigInt
-            const aInt = isSafeFloat(a) ? Math.round(a) : a;    // round value because unable to operate float vs BigInt    
+        case !isObj(a) && isObj(b):
+            const aValue = isSafeFloat(a) ? Math.floor(a) : 
+                isObj(a) ? a.num : a;   
             if (isSafeBigInt(b.num)) {
-                result = op(BigInt(aInt), b.num) / b.denom;
+                result = divide(
+                    operation(BigInt(aValue), b.num), 
+                    b.denom
+                );
                 break;
             }
-        default:                                                // Number | Float - Number | Float
-            result = op(a, b);                         
+        default:                                              
+            result = operation(a, b);                         
     }
     const isSafeType = isSafeNumber(result) || isSafeBigInt(result) || isSafeFloat(result);
     if (!isSafeType) throw Error(`Math operation result must be a safe number, float or BigInt`);
@@ -58,11 +69,11 @@ export const getByOperator = (m, type) => {
         'MAX': (a, b) => a > b,
         'MIN': (a, b) => a < b
     };
-    const op = operations[type];
+    const operation = operations[type];
     const startingValue = type === 'MAX' ? -Infinity : Infinity;
     let pair = [null, startingValue];
     for (const [key, value] of m.entries()) {
-        if (op(value, pair[1]) && value !== null) pair = [key, value];
+        if (operation(value, pair[1]) && value !== null) pair = [key, value];
     }
     return pair[0] === null ? null : pair;
 };
@@ -95,22 +106,9 @@ export const transformByScalar = (matrix, scalar, operation) => {
 
 export const matrixTranspose = (m) => {
     const transposedMatrix = new Map();
-    const lastKey = () => {
-        let keys = [];
-        m.forEach((_, index) => keys.push(index));
-        return keys.sort().reverse()[0];
-    }
     m.forEach((value, key) => {
-        const coords = key.split(',');
-        const row = coords[0];
-        const col = coords[1];
-        if (coords !== '0,0' && coords !== lastKey()) {
-            const newRow = col;
-            const newCol = row;
-            transposedMatrix.set(`${newRow},${newCol}`, value);
-        } else {
-            transposedMatrix.set(`${row},${col}`, value);
-        }
+        const [row, col] = key.split(',').map(Number);
+        transposedMatrix.set(`${col},${row}`, value);
     });
     return transposedMatrix;
 };
@@ -196,14 +194,23 @@ export const matrixMultiply = (m1, m2, rows, cols) => {
     const result = new Map();
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
-            let sum = 0;
+            let sums = [];
             for (let k = 0; k < rows; k++) {
                 const key1 = `${i},${k}`;
                 const key2 = `${k},${j}`;
-                sum += mathOperation((m1.get(key1) || 0), (m2.get(key2) || 0), 'MULTIPLY');
+                sums.push(mathOperation((m1.get(key1) || 0), (m2.get(key2) || 0), 'MULTIPLY'));
             }
-            const key = `${i}${j}`;
-            result.set(key, sum);
+            const hasBigInt = sums.map(sum => typeof sum === 'bigint').includes(true);
+            // convert all sums to BigInt if at least 1 is already present to ensure math operations work
+            if (hasBigInt) {
+                sums = sums.map(sum => {
+                    if (isSafeFloat(sum) || isSafeNumber(sum)) return BigInt(Math.floor(sum));
+                    return sum;
+                })
+            }
+            const totalSum = sums.reduce((a, b) => mathOperation(a, b, 'ADD'));
+            const fmtTotalSum = hasBigInt ? { num: totalSum, denom: 1n } : totalSum;
+            result.set(`${i},${j}`, fmtTotalSum);
         }
     }
     return result;
@@ -212,51 +219,76 @@ export const matrixMultiply = (m1, m2, rows, cols) => {
 export const matrixPseudoinverse = (m, config) => {
     const { rows, cols } = config;
 
-    if (rows >= cols) {
-        // Case 1: Tall (or square) matrix: Pseudoinverse = (A^T A)^(-1) A^T
-        const adjugate = matrixTranspose(m);
-        const multipliedAdjugate = matrixMultiply(adjugate, m, cols, rows);
-        const inverse = matrixInverse(multipliedAdjugate);
-
-        if (!inverse) {
-            throw new Error("Matrix is not full-rank, cannot compute inverse.");
+    // Convert map to a 2D array
+    const matrix = Array.from({ length: rows}, (_, i) =>
+        Array.from({ length: cols}, (_, j) => m.get(`${i},${j}`) || 0)
+    );
+    
+    // Compute the Moore-Penrose pseudoinverse using SVD
+    const pseudoInv = math.pinv(matrix);
+    
+    // Convert back to map format
+    const result = new Map();
+    for (let i = 0; i < pseudoInv.length; i++) {
+        for (let j = 0; j < pseudoInv[i].length; j++) {
+            result.set(`${i},${j}`, pseudoInv[i][j]);
         }
-
-        return matrixMultiply(inverse, adjugate, cols, rows);
-    } else {
-        // Case 2: Wide matrix: Pseudoinverse = A^T (A A^T)^(-1)
-        const adjugate = matrixTranspose(m);
-        const multipliedAdjugate = matrixMultiply(m, adjugate, rows, cols);
-        const inverse = matrixInverse(multipliedAdjugate);
-
-        if (!inverse) {
-            throw new Error("Matrix is not full-rank, cannot compute inverse.");
-        }
-
-        return matrixMultiply(adjugate, inverse, cols, rows);
     }
+
+    return result;
 };
 
+// export const matrixDivide = (m1, m2, m1Config, m2Config) => {
+//     if (m1Config.cols !== m2Config.rows) throw Error(`Unable to divide matrices with incompatible dimensions`);
+//     let inverse;
+//     // Case 1: If m2 is square, use the standard inverse
+//     if (m2Config.rows === m2Config.cols) {
+//         const det = matrixDeterminant(m2, m2Config.rows, m2Config.cols);
+//         if (det === 0) throw new Error("Cannot divide by a singular matrix (determinant is 0)");
+//         const co = matrixCofactor(m2, m2Config.rows, m2Config.cols);
+//         const adjugate = matrixTranspose(co);
+//         inverse = matrixInverse(adjugate, det);
+//     } else {     
+//         // Case 2: m2 is non-square, use Moore–Penrose pseudoinverse
+//         inverse = matrixPseudoinverse(m2, m2Config);
+//         if (!inverse) throw new Error("Pseudoinverse compution failed or matrix is not full-rank");
+//     }
+  
+//   // Multiply m1 by the inverse (or pseudoinverse) of m2
+//   return matrixMultiply(m1, inverse, m1Config.rows, m2Config.cols);
+// };
+
 export const matrixDivide = (m1, m2, m1Config, m2Config) => {
-    if (m1Config.cols !== m2Config.rows) throw Error(`Unable to divide matrices with incompatible dimensions`);
     let inverse;
-    // Case 1: If m2 is square, use the standard inverse.
+    // Determine the dimensions for the inverse based on m2 shape:
+    // For square m2, inv(m2) is (r, c) with r === c.
+    // For non-square m2, pseudoinverse(m2) is (m2Config.cols, m2Config.rows).
     if (m2Config.rows === m2Config.cols) {
-        const det = matrixDeterminant(m2, m2Config.rows, m2Config.cols);
-        if (det === 0) {
-        throw new Error("Cannot divide by a singular matrix (determinant is 0)");
+        // Verify m1's columns match m2's rows.
+        if (m1Config.cols !== m2Config.rows) {
+            throw new Error(`Incompatible dimensions: m1 has ${m1Config.cols} columns, but m2 has ${m2Config.rows} rows.`);
         }
+        const det = matrixDeterminant(m2, m2Config.rows, m2Config.cols);
+        if (det === 0) throw new Error("Cannot divide by a singular matrix (determinant is 0)");
         const co = matrixCofactor(m2, m2Config.rows, m2Config.cols);
         const adjugate = matrixTranspose(co);
         inverse = matrixInverse(adjugate, det);
-    } else {     
-        // Case 2: m2 is non-square, so compute its Moore–Penrose pseudoinverse.
+        // For a square m2, inverse dimensions match m2Config.rows x m2Config.cols.
+    } else {
+        // For non-square m2, compute the Moore–Penrose pseudoinverse.
+        // The pseudoinverse of an (r, c) matrix will have dimensions (c, r).
         inverse = matrixPseudoinverse(m2, m2Config);
-        if (!inverse) {
-            throw new Error("Pseudoinverse computation failed or matrix is not full-rank");
+        if (!inverse) throw new Error("Pseudoinverse computation failed or matrix is not full-rank");
+        // Check that m1's columns match the number of rows of the pseudoinverse.
+        // Pseudoinverse dimensions: rows = m2Config.cols, cols = m2Config.rows.
+        if (m1Config.cols !== m2Config.cols) {
+            throw new Error(`Incompatible dimensions: m1 has ${m1Config.cols} columns, but pseudoinverse of m2 has ${m2Config.cols} rows.`);
         }
     }
   
-  // Multiply m1 by the inverse (or pseudoinverse) of m2.
-  return matrixMultiply(m1, inverse, m1Config.rows, m2Config.cols);
+    // Multiply m1 by the inverse (or pseudoinverse) of m2.
+    // For square m2: result dimensions are m1Config.rows x m2Config.cols.
+    // For non-square m2: pseudoinverse is (m2Config.cols x m2Config.rows) so result is m1Config.rows x m2Config.rows.
+    const resultCols = (m2Config.rows === m2Config.cols) ? m2Config.cols : m2Config.rows;
+    return matrixMultiply(m1, inverse, m1Config.rows, resultCols);
 };

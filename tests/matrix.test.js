@@ -167,7 +167,7 @@ describe('setValue function', () => {
         {
             row: 1,
             col: 1,
-            value: 1000000000000000000000n,
+            value: MAX_SAFE_BIGINT + 1n,
             matrix: setMatrix(3, 3),
             res: `Value must be a safe number, float or BigInt`
         },

@@ -10,11 +10,14 @@ import {
     matrixDeterminant,
     matrixCofactor,
     matrixInverse,
+    matrixPseudoinverse,
     isEqualMatrix,
     transformByScalar,
     findByValue,
     getByOperator,
     getMean,
+    matrixMultiply,
+    matrixDivide,
 } from '../operations';
 
 // adding float to bigInt reduces precision by a lot!
@@ -40,7 +43,7 @@ describe('mathOperation function', () => {
         expect(mathOperation({ num: 102344200n, denom: 1n }, { num: 102344200n, denom: 1n }, 'ADD').toString()).toEqual("204688400");
         expect(mathOperation({ num: 1034232422344200n, denom: 1n }, { num: 102344342424200n, denom: 1n }, 'ADD').toString()).toEqual("1136576764768400");
         expect(mathOperation({ num: 1034232422344979200n, denom: 1n }, { num: 1023454644342424200n, denom: 1n }, 'ADD').toString()).toEqual("2057687066687403400");
-        expect(() => mathOperation({ num: 103423242234497999999999999200n, denom: 1n }, { num: 1023454644342429999999994200n, denom: 1n }, 'ADD').toString()).toThrow("Math operation result must be a safe number, float or BigInt");
+        expect(() => mathOperation({ num: 1034232422344979999999999943439200n, denom: 1n }, { num: 1023454434343434644342429999999994200n, denom: 1n }, 'ADD').toString()).toThrow("Math operation result must be a safe number, float or BigInt");
         expect(() => mathOperation({ num: 1034232422344979999534453424533499999999200n, denom: 1n }, 0.083412, 'ADD').toString()).toThrow("Math operation result must be a safe number, float or BigInt");
         expect(() => mathOperation(null, 0.083412, 'ADD').toString()).toThrow("Unable to perform math operation on null value");
         expect(() => mathOperation(1923478, null, 'ADD').toString()).toThrow("Unable to perform math operation on null value");
@@ -65,7 +68,7 @@ describe('mathOperation function', () => {
         expect(mathOperation({ num: 102344200n, denom: 1n }, { num: 102344200n, denom: 1n }, 'SUBTRACT').toString()).toEqual("0");
         expect(mathOperation({ num: 1034232422344200n, denom: 1n }, { num: 102344342424200n, denom: 1n }, 'SUBTRACT').toString()).toEqual("931888079920000");
         expect(mathOperation({ num: 1034232422344979200n, denom: 1n }, { num: 1023454644342424200n, denom: 1n }, 'SUBTRACT').toString()).toEqual("10777778002555000");
-        expect(() => mathOperation({ num: 103423242234497999999999999200n, denom: 1n }, { num: 1023454644342429999999994200n, denom: 1n }, 'SUBTRACT').toString()).toThrow("Math operation result must be a safe number, float or BigInt");
+        expect(() => mathOperation({ num: 10300000000004232422344903455074234324999999999999200n, denom: 1n }, { num: 1023454644342429999999994200n, denom: 1n }, 'SUBTRACT').toString()).toThrow("Math operation result must be a safe number, float or BigInt");
         expect(() => mathOperation({ num: 1034232422344979999534453424533499999999200n, denom: 1n }, 0.083412, 'SUBTRACT').toString()).toThrow("Math operation result must be a safe number, float or BigInt");
         expect(() => mathOperation(null, 0.083412, 'SUBTRACT').toString()).toThrow("Unable to perform math operation on null value");
         expect(() => mathOperation(1923478, null, 'SUBTRACT').toString()).toThrow("Unable to perform math operation on null value");
@@ -78,6 +81,7 @@ describe('mathOperation function', () => {
         expect(mathOperation(1.5, 2, 'MULTIPLY')).toEqual(3);
         expect(mathOperation(1.8947, 1.78932, 'MULTIPLY')).toEqual(3.390224604)
         expect(mathOperation({ num: 1000n, denom: 1n }, 1000, 'MULTIPLY').toString()).toEqual("1000000");
+        expect(mathOperation({ num: 1000n, denom: 1n }, 10.23402, 'MULTIPLY').toString()).toEqual("10000");
         expect(mathOperation({ num: 1000n, denom: 1n }, { num: 1000n, denom: 1n }, 'MULTIPLY').toString()).toEqual("1000000");
         expect(() => mathOperation(null, 2, 'MULTIPLY')).toThrow("Unable to perform math operation on null value");
     });
@@ -91,6 +95,17 @@ describe('mathOperation function', () => {
         expect(mathOperation({ num: 1000n, denom: 1n }, 1000, 'DIVIDE').toString()).toEqual("1");
         expect(mathOperation({ num: 1000n, denom: 1n }, { num: 10n, denom: 1n }, 'DIVIDE').toString()).toEqual("100");
         expect(() => mathOperation(null, 2, 'DIVIDE')).toThrow("Unable to perform math operation on null value");
+    });
+
+    test('Should return correct MOD operation', () => { 
+        expect(mathOperation(6, 3, 'MOD')).toEqual(0);
+        expect(mathOperation(132, 11, 'MOD')).toEqual(0);
+        expect(mathOperation(20, -10, 'MOD')).toEqual(0);
+        expect(mathOperation(20, 3, 'MOD')).toEqual(2);
+        expect(mathOperation(1.8947, 1.78932, 'MOD')).toBeCloseTo(0.10538000000000003, 2);
+        expect(mathOperation({ num: 1000n, denom: 1n }, 1000, 'MOD').toString()).toEqual("0");
+        expect(mathOperation({ num: 1000n, denom: 1n }, { num: 10n, denom: 1n }, 'MOD').toString()).toEqual("0");
+        expect(() => mathOperation(null, 2, 'MOD')).toThrow("Unable to perform math operation on null value");
     });
 });
 
@@ -133,6 +148,16 @@ describe('findByValue function', () => {
             ]),
             value: 2,
             expected: '0,1'
+        },
+        {
+            m: new Map([
+                ['0,0', 100],
+                ['0,1', 2],
+                ['1,0', 1],
+                ['1,1', 0.342]
+            ]),
+            value: 32,
+            expected: null
         }
     ];
     test('Should return correct key based on given value', () => {
@@ -140,7 +165,7 @@ describe('findByValue function', () => {
             const { m, value, expected } = successCase;
             expect(findByValue(m, value)).toEqual(expected);
         }
-    })
+    });
 });
 
 describe('getByOperator function', () => {
@@ -760,6 +785,288 @@ describe('matrixInverse function', () => {
         for (const cases of matrixInverseSuccesses) {
             const { adjugate, determinant, expected } = cases();
             expect(matrixInverse(adjugate, determinant)).toEqual(expected);
+        }
+    });
+});
+
+describe('matrixPseudoinverse function', () => {
+    const matrixPseudoinverseSuccesses = [
+        () => {
+            const initial = Matrix(2, 3);
+            [
+                [0, 0, 3],
+                [0, 1, 2],
+                [0, 2, 2],
+                [1, 0, 2],
+                [1, 1, 3],
+                [1, 2, -2],
+            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
+            const expected = Matrix(3, 2);
+            [
+                [0, 0, 0.15555555555555572],
+                [0, 1, 0.04444444444444448],
+                [1, 0, 0.044444444444444536],
+                [1, 1, 0.1555555555555556],
+                [2, 0, 0.22222222222222227],
+                [2, 1, -0.22222222222222227]
+            ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
+            const rows = 2;
+            const cols = 3;
+            return {
+                initial: initial.matrix,
+                config: { rows, cols},
+                expected: expected.matrix
+            }
+        },
+    ]
+    test('Should return correct pseudoInverse matrix', () => {
+        for (const cases of matrixPseudoinverseSuccesses) {
+            const { initial, config, expected } = cases();
+            expect(matrixPseudoinverse(initial, config)).toEqual(expected);
+        }
+    });
+});
+
+describe('matrixMultiply function', () => {
+    const matrixMultiplySuccesses = [
+        () => {
+            const initial = Matrix(2, 2);
+            [
+                [0, 0, 3],
+                [0, 1, 2],
+                [1, 0, 2],
+                [1, 1, 3],
+            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
+            const initial2 = Matrix(2, 2);
+            [
+                [0, 0, 43],
+                [0, 1, 43],
+                [1, 0, 55],
+                [1, 1, 64],
+            ].forEach(arr => initial2.set(arr[0], arr[1], arr[2]));
+            const expected = Matrix(2, 2);
+            [
+                [0, 0, 239],
+                [0, 1, 257],
+                [1, 0, 251],
+                [1, 1, 278],
+            ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
+            const rows = 2;
+            const cols = 2;
+            return {
+                initial: initial.matrix,
+                initial2: initial2.matrix,
+                config: { rows, cols},
+                expected: expected.matrix
+            }
+        },
+        () => {
+            const initial = Matrix(2, 2);
+            [
+                [0, 0, 0.32],
+                [0, 1, 2],
+                [1, 0, 2],
+                [1, 1, 3],
+            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
+            const initial2 = Matrix(2, 2);
+            [
+                [0, 0, 43],
+                [0, 1, 43],
+                [1, 0, 55],
+                [1, 1, 64],
+            ].forEach(arr => initial2.set(arr[0], arr[1], arr[2]));
+            const expected = Matrix(2, 2);
+            [
+                [0, 0, 123.76],
+                [0, 1, 141.76],
+                [1, 0, 251],
+                [1, 1, 278],
+            ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
+            const rows = 2;
+            const cols = 2;
+            return {
+                initial: initial.matrix,
+                initial2: initial2.matrix,
+                config: { rows, cols},
+                expected: expected.matrix
+            }
+        },
+        () => {
+            const initial = Matrix(2, 2);
+            [
+                [0, 0, 0.43232],
+                [0, 1, 258349000334n],
+                [1, 0, 2],
+                [1, 1, 3],
+            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
+            const initial2 = Matrix(2, 2);
+            [
+                [0, 0, 43],
+                [0, 1, 43],
+                [1, 0, 42.0423],
+                [1, 1, 6457593n],
+            ].forEach(arr => initial2.set(arr[0], arr[1], arr[2]));
+            const expected = Matrix(2, 2);
+            [
+                [0, 0, 10850658014046n],
+                [0, 1, 1668312696113836080n],
+                [1, 0, 212.12689999999998],
+                [1, 1, 19372865n],
+            ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
+            const rows = 2;
+            const cols = 2;
+            return {
+                initial: initial.matrix,
+                initial2: initial2.matrix,
+                config: { rows, cols },
+                expected: expected.matrix
+            }
+        },
+    ]
+    test('Should return correct matrix multiplication', () => {
+        for (const cases of matrixMultiplySuccesses) {
+            const { initial, initial2, config, expected } = cases();
+            const { rows, cols } = config;
+            expect(matrixMultiply(initial, initial2, rows, cols)).toEqual(expected);
+        }
+    });
+});
+
+describe('matrixDivide function', () => {
+    const matrixDivideSuccesses = [
+        () => {
+            const initial = Matrix(2, 2);
+            [
+                [0, 0, 3],
+                [0, 1, 2],
+                [1, 0, 2],
+                [1, 1, 3],
+            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
+            const initial2 = Matrix(2, 2);
+            [
+                [0, 0, 43],
+                [0, 1, 43],
+                [1, 0, 55],
+                [1, 1, 64],
+            ].forEach(arr => initial2.set(arr[0], arr[1], arr[2]));
+            const expected = Matrix(2, 2);
+            [
+                [0, 0, 0.21188630490956073],
+                [0, 1, -0.1111111111111111],
+                [1, 0, -0.09560723514211883],
+                [1, 1, 0.1111111111111111],
+            ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
+            const rows = 2;
+            const cols = 2;
+            return {
+                initial: initial.matrix,
+                initial2: initial2.matrix,
+                m1Config: { rows, cols },
+                m2Config: { rows, cols },
+                expected: expected.matrix
+            }
+        },
+        () => {
+            const initial = Matrix(2, 2);
+            [
+                [0, 0, 0.32],
+                [0, 1, 2],
+                [1, 0, 2],
+                [1, 1, 3],
+            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
+            const initial2 = Matrix(2, 2);
+            [
+                [0, 0, 43],
+                [0, 1, 43],
+                [1, 0, 55],
+                [1, 1, 64],
+            ].forEach(arr => initial2.set(arr[0], arr[1], arr[2]));
+            const expected = Matrix(2, 2);
+            [
+                [0, 0, -0.23131782945736432],
+                [0, 1, 0.18666666666666665],
+                [1, 0, -0.09560723514211883],
+                [1, 1, 0.1111111111111111],
+            ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
+            const rows = 2;
+            const cols = 2;
+            return {
+                initial: initial.matrix,
+                initial2: initial2.matrix,
+                m1Config: { rows, cols },
+                m2Config: { rows, cols },
+                expected: expected.matrix
+            }
+        },
+        () => {
+            const initial = Matrix(2, 2);
+            [
+                [0, 0, 0.43232],
+                [0, 1, 258349000334n],
+                [1, 0, 2],
+                [1, 1, 3],
+            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
+            const initial2 = Matrix(2, 2);
+            [
+                [0, 0, 1],
+                [0, 1, 32],
+                [1, 0, 42],
+                [1, 1, 53],
+            ].forEach(arr => initial2.set(arr[0], arr[1], arr[2]));
+            const expected = Matrix(2, 2);
+            [
+                [0, 0, -1n],
+                [0, 1, -258349000334n],
+                [1, 0, 0.015491866769945767],
+                [1, 1, 0.047250193648334625],
+            ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
+            const rows = 2;
+            const cols = 2;
+            return {
+                initial: initial.matrix,
+                initial2: initial2.matrix,
+                m1Config: { rows, cols },
+                m2Config: { rows, cols },
+                expected: expected.matrix
+            }
+        },
+        () => {
+            const initial = Matrix(2, 2);
+            [
+                [0, 0, 423],
+                [0, 1, 4324],
+                [1, 0, 4],
+                [1, 1, 3],
+            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
+            const initial2 = Matrix(2, 3);
+            [
+                [0, 0, 134],
+                [0, 1, 32],
+                [0, 2, 42],
+                [1, 0, 4],
+                [1, 1, 5],
+                [1, 2, 4]
+            ].forEach(arr => initial2.set(arr[0], arr[1], arr[2]));
+            const expected = Matrix(2, 2);
+            [
+                [0, 0, -1n],
+                [0, 1, -258349000334n],
+                [1, 0, 0.015491866769945767],
+                [1, 1, 0.047250193648334625],
+            ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
+            return {
+                initial: initial.matrix,
+                initial2: initial2.matrix,
+                m1Config: { rows: 2, cols: 2 },
+                m2Config: { rows: 2, cols: 3 },
+                expected: expected.matrix
+            }
+        },
+    ]
+    test('Should return correct matrix division', () => {
+        for (const cases of matrixDivideSuccesses) {
+            const { initial, initial2, m1Config, m2Config, expected } = cases();
+            expect(matrixDivide(initial, initial2, m1Config, m2Config)).toEqual(expected);
         }
     });
 });

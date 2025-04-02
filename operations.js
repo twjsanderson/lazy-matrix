@@ -238,52 +238,20 @@ export const matrixPseudoinverse = (m, config) => {
     return result;
 };
 
-// export const matrixDivide = (m1, m2, m1Config, m2Config) => {
-//     if (m1Config.cols !== m2Config.rows) throw Error(`Unable to divide matrices with incompatible dimensions`);
-//     let inverse;
-//     // Case 1: If m2 is square, use the standard inverse
-//     if (m2Config.rows === m2Config.cols) {
-//         const det = matrixDeterminant(m2, m2Config.rows, m2Config.cols);
-//         if (det === 0) throw new Error("Cannot divide by a singular matrix (determinant is 0)");
-//         const co = matrixCofactor(m2, m2Config.rows, m2Config.cols);
-//         const adjugate = matrixTranspose(co);
-//         inverse = matrixInverse(adjugate, det);
-//     } else {     
-//         // Case 2: m2 is non-square, use Moore–Penrose pseudoinverse
-//         inverse = matrixPseudoinverse(m2, m2Config);
-//         if (!inverse) throw new Error("Pseudoinverse compution failed or matrix is not full-rank");
-//     }
-  
-//   // Multiply m1 by the inverse (or pseudoinverse) of m2
-//   return matrixMultiply(m1, inverse, m1Config.rows, m2Config.cols);
-// };
-
 export const matrixDivide = (m1, m2, m1Config, m2Config) => {
     let inverse;
-    // Determine the dimensions for the inverse based on m2 shape:
-    // For square m2, inv(m2) is (r, c) with r === c.
-    // For non-square m2, pseudoinverse(m2) is (m2Config.cols, m2Config.rows).
     if (m2Config.rows === m2Config.cols) {
-        // Verify m1's columns match m2's rows.
-        if (m1Config.cols !== m2Config.rows) {
-            throw new Error(`Incompatible dimensions: m1 has ${m1Config.cols} columns, but m2 has ${m2Config.rows} rows.`);
-        }
+        if (m1Config.cols !== m2Config.rows) throw new Error(`Incompatible dimensions: m1 has ${m1Config.cols} columns, but m2 has ${m2Config.rows} rows.`);
         const det = matrixDeterminant(m2, m2Config.rows, m2Config.cols);
         if (det === 0) throw new Error("Cannot divide by a singular matrix (determinant is 0)");
         const co = matrixCofactor(m2, m2Config.rows, m2Config.cols);
         const adjugate = matrixTranspose(co);
         inverse = matrixInverse(adjugate, det);
-        // For a square m2, inverse dimensions match m2Config.rows x m2Config.cols.
     } else {
         // For non-square m2, compute the Moore–Penrose pseudoinverse.
-        // The pseudoinverse of an (r, c) matrix will have dimensions (c, r).
         inverse = matrixPseudoinverse(m2, m2Config);
         if (!inverse) throw new Error("Pseudoinverse computation failed or matrix is not full-rank");
-        // Check that m1's columns match the number of rows of the pseudoinverse.
-        // Pseudoinverse dimensions: rows = m2Config.cols, cols = m2Config.rows.
-        if (m1Config.cols !== m2Config.cols) {
-            throw new Error(`Incompatible dimensions: m1 has ${m1Config.cols} columns, but pseudoinverse of m2 has ${m2Config.cols} rows.`);
-        }
+        if (m1Config.cols !== m2Config.cols) throw new Error(`Incompatible dimensions: m1 has ${m1Config.cols} columns, but pseudoinverse of m2 has ${m2Config.cols} rows.`);
     }
   
     // Multiply m1 by the inverse (or pseudoinverse) of m2.

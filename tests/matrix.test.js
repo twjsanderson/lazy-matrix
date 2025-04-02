@@ -400,3 +400,42 @@ describe('getValue function', () => {
         }
     });
 });
+
+
+describe('Matrix function', () => {
+    const functionNames = [
+        'set',
+        'delete',
+        'get',
+        'size',
+        'isSquare',
+        'equals',
+        'find',
+        'min',
+        'max',
+        'mean',
+        'transpose',
+        'determinant',
+        'cofactor',
+        'inverse',
+        'multiplyBy',
+        'divideBy',
+        'addBy',
+        'subtractBy',
+        'moduloBy',
+        'multiply',
+        'divide',
+    ];
+    const m = Matrix(3, 2);
+    test('Should contain all functions & properties', () => {
+        expect(m).toHaveProperty('matrix');
+        expect(m).toHaveProperty('rows');
+        expect(m).toHaveProperty('cols');
+        for (const func of functionNames) {
+            expect(m).toHaveProperty(func);
+            expect(m.hasOwnProperty(func)).toBe(true);
+            expect(m[func]).toBeInstanceOf(Function);
+        }
+    });
+});
+

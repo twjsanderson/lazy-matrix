@@ -109,14 +109,4 @@ export const Matrix = (r, c) => {
 
     };
     return Object.assign(properties, functions);
-}
-
-/**
- * update divide
- * modulo
- * min
- * max
- * diag
- * mean
- * 
- */
+};

@@ -1031,33 +1031,69 @@ describe('matrixDivide function', () => {
             }
         },
         () => {
-            const initial = Matrix(2, 2);
+            const initial = Matrix(3, 2);
+            [
+                [0, 0, 134],
+                [0, 1, 32],
+                [1, 0, 4],
+                [1, 1, 5],
+                [2, 0, 43],
+                [2, 1, 78]
+            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
+            const initial2 = Matrix(2, 2);
             [
                 [0, 0, 423],
                 [0, 1, 4324],
                 [1, 0, 4],
                 [1, 1, 3],
-            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
-            const initial2 = Matrix(2, 3);
-            [
-                [0, 0, 134],
-                [0, 1, 32],
-                [0, 2, 42],
-                [1, 0, 4],
-                [1, 1, 5],
-                [1, 2, 4]
             ].forEach(arr => initial2.set(arr[0], arr[1], arr[2]));
-            const expected = Matrix(2, 2);
+            const expected = Matrix(3, 2);
             [
-                [0, 0, -1n],
-                [0, 1, -258349000334n],
-                [1, 0, 0.015491866769945767],
-                [1, 1, 0.047250193648334625],
+                [0, 0, -0.0170961502464591],
+                [0, 1, 35.30791788856305],
+                [1, 0, 0.0004991576714294628],
+                [1, 1, 0.9472140762463342],
+                [2, 0, 0.01141823173394896],
+                [2, 1, 9.542521994134896],
             ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
             return {
                 initial: initial.matrix,
                 initial2: initial2.matrix,
-                m1Config: { rows: 2, cols: 2 },
+                m1Config: { rows: 3, cols: 2 },
+                m2Config: { rows: 2, cols: 2 },
+                expected: expected.matrix
+            }
+        },
+        () => {
+            const initial = Matrix(2, 3);
+            [
+                [0, 0, 134],
+                [0, 1, 32],
+                [0, 2, 43],
+                [1, 0, 4],
+                [1, 1, 5],
+                [1, 2, 89],
+            ].forEach(arr => initial.set(arr[0], arr[1], arr[2]));
+            const initial2 = Matrix(2, 3);
+            [
+                [0, 0, 423],
+                [0, 1, 4324],
+                [0, 2, 63],
+                [1, 0, 4],
+                [1, 1, 3],
+                [1, 2, 897],
+            ].forEach(arr => initial2.set(arr[0], arr[1], arr[2]));
+            const expected = Matrix(2, 2);
+            [
+                [0, 0, 0.010331591304834072],
+                [0, 1, -0.00012844474770182766],
+                [1, 0, 0.0012350206042938],
+                [1, 1, -0.00007071860188694046],
+            ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
+            return {
+                initial: initial.matrix,
+                initial2: initial2.matrix,
+                m1Config: { rows: 2, cols: 3 },
                 m2Config: { rows: 2, cols: 3 },
                 expected: expected.matrix
             }

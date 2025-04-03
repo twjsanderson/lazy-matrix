@@ -13,15 +13,13 @@ export const mathOperation = (a, b, type) => {
     const operation = operations[type];
     const divide = operations['DIVIDE'];
     let result = 0;
-
     switch (true) {
         case isObj(a) && isObj(b): {
-            // BigInt - BigInt
             if (isSafeBigInt(a.num) && isSafeBigInt(b.num)) {            
                 result = operation(a.num, b.num);
                 break;
-            }      
-            break;   
+            }
+            throw Error(`Math operation result must be a safe number, float or BigInt`);
         }            
         case isObj(a) && !isObj(b): {
             const bValue = isSafeFloat(b) ? Math.floor(b) : 
@@ -32,8 +30,8 @@ export const mathOperation = (a, b, type) => {
                     a.denom
                 );
                 break;         
-            }         
-            break;
+            }     
+            throw Error(`Math operation result must be a safe number, float or BigInt`);
         }
         case !isObj(a) && isObj(b): {
             const aValue = isSafeFloat(a) ? Math.floor(a) : 
@@ -45,9 +43,9 @@ export const mathOperation = (a, b, type) => {
                 );
                 break;
             }
-            break;
+            throw Error(`Math operation result must be a safe number, float or BigInt`);
         }
-        default: {                                           
+        default: {                                     
             result = operation(a, b);
             break;
         }                       

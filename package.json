@@ -1,30 +1,48 @@
 {
   "name": "lazy-matrix",
   "version": "1.0.0",
-  "description": "",
+  "description": "Lazy-Matrix is a lightweight, intuitive JavaScript library for generating, modifying, and performing operations on matrices. Designed for the 'lazy programmer', it simplifies working with 2D arrays by allowing you to mix numbers, floats, and BigInts in a single matrix.",
   "main": "index.js",
   "type": "module",
-  "license": "AGPL-version-3.0",
+  "license": "MIT",
   "private": false,
   "engines": {
     "node": ">= 14.0.0",
     "npm": ">= 6.0.0"
   },
-  "homepage": "",
+  "homepage": "https://github.com/twjsanderson/lazy-matrix",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/twjsanderson/lazy-matrix"
   },
-  "bugs": "",
-  "keywords": [],
+  "bugs": "https://github.com/twjsanderson/lazy-matrix/issues",
+  "keywords": [
+    "lazy-matrix",
+    "matrix",
+    "linear algebra",
+    "2D array",
+    "matrix operations",
+    "matrix multiplication",
+    "matrix division",
+    "matrix inversion",
+    "matrix transpose",
+    "determinant",
+    "cofactor",
+    "pseudoinverse",
+    "math",
+    "BigInt",
+    "floating point",
+    "float",
+    "numerical computing",
+    "lazy",
+    "easy math"
+  ],
   "author": {
-    "name": "",
-    "email": "",
-    "url": ""
+    "name": "Tom",
+    "email": "tom.w.j.sanderson@gmail.com"
   },
-  "contributors": [],
+  "contributors": ["Tom"],
   "scripts": {
-    "dev": "",
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint ."

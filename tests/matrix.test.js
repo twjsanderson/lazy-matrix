@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'jest';
+import { describe, test, expect } from '@jest/globals';
 import {
     SAFE_MATRIX_SIZE,
     MAX_SAFE_BIGINT,

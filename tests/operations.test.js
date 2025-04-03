@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'jest';
+import { describe, test, expect } from '@jest/globals';
 import { Matrix } from '../matrix';
 import {
     mathOperation,
@@ -39,7 +39,7 @@ describe('mathOperation function', () => {
         expect(mathOperation({ num: 102344200n, denom: 1n }, { num: 102344200n, denom: 1n }, 'ADD').toString()).toEqual("204688400");
         expect(mathOperation({ num: 1034232422344200n, denom: 1n }, { num: 102344342424200n, denom: 1n }, 'ADD').toString()).toEqual("1136576764768400");
         expect(mathOperation({ num: 1034232422344979200n, denom: 1n }, { num: 1023454644342424200n, denom: 1n }, 'ADD').toString()).toEqual("2057687066687403400");
-        expect(() => mathOperation({ num: 1034232422344979999999999943439200n, denom: 1n }, { num: 1023454434343434644342429999999994200n, denom: 1n }, 'ADD').toString()).toThrow("Math operation result must be a safe number, float or BigInt");
+        expect(() => mathOperation({ num: 10342324223442345523542352342523979999999999943439200n, denom: 1n }, { num: 1023454434343434644342429999993455434535354353543994200n, denom: 1n }, 'ADD').toString()).toThrow('Math operation result must be a safe number, float or BigInt');
         expect(() => mathOperation({ num: 1034232422344979999534453424533499999999200n, denom: 1n }, 0.083412, 'ADD').toString()).toThrow("Math operation result must be a safe number, float or BigInt");
         expect(() => mathOperation(null, 0.083412, 'ADD').toString()).toThrow("Unable to perform math operation on null value");
         expect(() => mathOperation(1923478, null, 'ADD').toString()).toThrow("Unable to perform math operation on null value");

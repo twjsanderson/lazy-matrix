@@ -1,7 +1,7 @@
 {
   "name": "lazy-matrix",
   "version": "1.0.0",
-  "description": "Lazy-Matrix is a lightweight, intuitive JavaScript library for generating, modifying, and performing operations on matrices. Designed for the 'lazy programmer', it simplifies working with 2D arrays by allowing you to mix numbers, floats, and BigInts in a single matrix.",
+  "description": "Lazy-Matrix is a lightweight, intuitive JavaScript library for generating, modifying, and performing operations on matrices. Designed for the 'lazy programmer', it simplifies working with 2D arrays by allowing you to mix Numbers, Floats, and BigInts in a single matrix.",
   "main": "index.js",
   "type": "module",
   "license": "MIT",

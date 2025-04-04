@@ -82,8 +82,8 @@ export const Matrix = (r, c) => {
     const properties = { rows, cols, matrix };
     const functions = { 
         set: (row, col, value) => setValue(matrix, row, col, value),
-        delete: (row, col) => deleteValue(matrix, row, col),
         get: (row, col) => getValue(matrix, row, col),
+        delete: (row, col) => deleteValue(matrix, row, col),
         size: () => getMatrixSize(matrix),
         isSquare: () => getIsSquare(rows, cols),
         equals: (m2) =>  isEqualMatrix(matrix, m2),

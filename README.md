@@ -46,9 +46,7 @@ This is a JavaScript library made for lazy developers who don't want to do type 
 - Defaults all values to null
 
 ```javascript
-// Creates a 2 x 2 matrix
 const m = Matrix(2, 2);
-
 /**
  * 
  *  [
@@ -57,12 +55,8 @@ const m = Matrix(2, 2);
  *  ]
  * 
  */
-```
 
-```javascript
-// Creates a 3 x [2, 3, 4] matrix
 const m = Matrix(3, [2, 3, 4]);
-
 /**
  * 
  *  [
@@ -133,7 +127,6 @@ console.log(m.delete(0, 0)); // true
  *  [
  *    [null, 50],
  *    [0.342, 34672642347290478n],
- *  
  *  ]
  * 
  */
@@ -168,7 +161,7 @@ console.log(m4.isSquare()); // true
 ```
 
 ### **.equals(**``m2: Matrix``**)** => ``boolean``
-- Returns true if parent matrix and m2 are equal in both size and values, else false
+- Returns true if matrices are equal in both size and values, else return false
 
 ```javascript
 const m = Matrix(34, 34);
@@ -185,7 +178,7 @@ console.log(m.equals(m2)); // true
 ```
 
 ### **.find(**``value: number | float | bigInt``**)** => ``string | null``
-- Returns the key of the given value if present in the matrix, else null
+- Returns the key of the given value if present in the matrix, else return null
 
 ```javascript
 const m = Matrix(34, 34);
@@ -197,7 +190,7 @@ const m2 = Matrix(20, 43);
 console.log(m.find(m2)); // false
 ```
 
-### **.min(****)** => ``[string, number | float | bigint] | null``
+### **.min()** => ``[string, number | float | bigint] | null``
 - Returns the smallest value in the entire matrix
 - Does not consider null values
 - If no values found in matrix, return null
@@ -225,7 +218,7 @@ m.set(1, 1, null);
 console.log(m.min()); // null
 ```
 
-### **.max(****)** => ``[string, number | float | bigint] | null``
+### **.max()** => ``[string, number | float | bigint] | null``
 - Returns the largest value in the entire matrix
 - Does not consider null values
 - If no values found in matrix, return null
@@ -253,7 +246,125 @@ m.set(1, 1, null);
 console.log(m.max()); // null
 ```
 
+### **.mean(``axis: string``, ``index: number``)** => ``number``
+- Given a specific axis ('row' or 'col') & an index, return the mean of that axis
+- Null values are converted to 0 so the mean is always found
 
+```javascript
+const m = Matrix(2, 2);
+m.set(0, 0, 1000);
+m.set(0, 1, 50);
+m.set(1, 0, 0.342);
+m.set(1, 1, 34672642347290478n);
+console.log(m.mean('row', 0)); // 1025
+console.log(m.mean('col', 0)); // 500.171
+
+const m = Matrix(2, 2);
+m.set(0, 0, 2);
+m.set(0, 1, 6);
+m.set(1, 0, 4);
+m.set(1, 1, null);
+console.log(m.mean('col', 1)); // (6 + 0 (null)) / 2 = 3
+```
+
+### **.transpose()** => ``Matrix``
+- Returns a new transposed matrix
+
+```javascript
+const m = Matrix(2, 2);
+m.set(0, 0, 1);
+m.set(0, 1, 2);
+m.set(1, 0, 3);
+m.set(1, 1, 4);
+/**
+ *
+ *  [
+ *    [1, 2],
+ *    [3, 4],
+ *  ]
+ * 
+ */
+
+const transposition = m.transpose();
+/**
+ *
+ *  [
+ *    [1, 3],
+ *    [2, 4],
+ *  ]
+ * 
+ */
+
+const m2 = m2atrix(2, 3);
+m2.set(0, 0, 1);
+m2.set(0, 1, 2);
+m2.set(0, 2, 3);
+m2.set(1, 0, 4);
+m2.set(1, 1, 5);
+m2.set(1, 2, 6);
+/**
+ *
+ *  [
+ *    [1, 2, 3],
+ *    [4, 5, 6],
+ *  ]
+ * 
+ */
+
+const transposition = m2.transpose();
+/**
+ *
+ *  [
+ *    [1, 4],
+ *    [2, 5],
+ *    [3, 6],
+ *  ]
+ * 
+ */
+```
+
+### **.determinant()** => ``number``
+- Returns the determinant of a square matrix
+- Cannot calculate the determinant of non-square matrices
+
+```javascript
+const m = Matrix(2, 2);
+m.set(0, 0, 1);
+m.set(0, 1, 2);
+m.set(1, 0, 3);
+m.set(1, 1, 4);
+console.log(m.determinant()); // -2
+```
+
+### **.cofactor()** => ``number``
+- Returns the cofactor of a square matrix
+- Cannot calculate the cofactor of non-square matrices
+
+```javascript
+const m = Matrix(2, 2);
+m.set(0, 0, 1);
+m.set(0, 1, 2);
+m.set(1, 0, 3);
+m.set(1, 1, 4);
+/**
+ *
+ *  [
+ *    [1, 2],
+ *    [3, 4],
+ *  ]
+ * 
+ */
+
+const cofactor = m.cofactor();
+/**
+ *
+ *  [
+ *    [4, -3],
+ *    [-2, 1],
+ *  ]
+ * 
+ */
+```
 
 
 

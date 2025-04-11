@@ -1,25 +1,26 @@
 # Lazy-Matrix
-Lazy-Matrix is a lightweight JavaScript library for generating, modifying, and performing operations on matrices. 
 
-![A lazy programmer coding on a beach](https://github.com/twjsanderson/lazy-matrix/assets/lazy-programmer-on-the-beach.jpg?raw=true)
+A lightweight JavaScript library for generating, modifying, and performing operations on 2D matrices. 
 
-Designed for the 'lazy programmer', it simplifies working with 2D arrays by allowing you to mix **Numbers**, **Floats**, and **BigInts** in a single matrix. 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/twjsanderson/lazy-matrix/main/assets/lazy-programmer-on-the-beach.jpg" width="200" height="200" />
+</div>
 
-Beyond just creation and manipulation, Lazy-Matrix provides a suite of elementary mathematical operations—including multiplication and division—to make matrix arithmetic effortless.
+Designed for the 'lazy programmer', it allows you to mix **Numbers**, **Floats** and **BigInts** in a single matrix. 
+
+Beyond just CRUD operations, **Lazy-Matrix** offers a suite of elementary mathematical operations to make your life easier.
 
 Mix, match and be lazy.
 
 ## CAUTION
 
-Lazy-matrix enables you to perform mathematical operations on mixture of data types (**Numbers**, **Floats**, and **BigInts**).
+Lazy-matrix enables you to perform mathematical operations on a mixture of data types (**Numbers**, **Floats** and **BigInts**).
 
 We perform type conversions under the hood to make this possible and it comes at a high cost to both precision and speed.
 
 **DO NOT** expect high precision results when mixing data types.
 
-This JavaScript library is made for lazy programmers who don't want to do build matrices, perform type conversions or write out math logic themselves.
-
-It's meant to save you some time and effort, not to be used by NASA.
+This library was made for lazy programmers who want an simple solution to matrix manipulation, not to help NASA launch a spaceship.
 
 ## Table of Contents
 - [Installation](#installation)

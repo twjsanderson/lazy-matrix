@@ -18,12 +18,12 @@ We perform type conversions under the hood to make this possible and it comes at
 
 **DO NOT** expect high precision results when mixing data types.
 
-This library was made for lazy programmers who want an simple solution to matrix manipulation, not to help NASA launch a spaceship.
+This library was made for lazy programmers who want a simple solution to matrix manipulation, not to help NASA launch a spaceship.
 
 ## Table of Contents
 - [Installation](#installation)
-- [Documentation](#documentation)
 - [Workflows](#workflows)
+- [Documentation](#documentation)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -695,7 +695,7 @@ m.divide(m2);
 
 MIT License
 
-Copyright (c) [2025] [Tom Sanderson]
+Copyright (c) 2025 Tom Sanderson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

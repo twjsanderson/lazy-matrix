@@ -1,5 +1,6 @@
 import * as math from 'mathjs';
-import { isObj, isSafeBigInt, isSafeFloat, isSafeNumber, isMap } from './utils';
+import { isObj, isSafeBigInt, isSafeFloat, isSafeNumber, isMap } from './utils.js';
+import { buildMatrix } from './matrix.js';
 
 export const mathOperation = (a, b, type) => {
     if (a === null || b === null) throw Error('Unable to perform math operation on null value')
@@ -55,11 +56,12 @@ export const mathOperation = (a, b, type) => {
     return result;
 };
 
-export const isEqualMatrix = (m1, m2) => {
-    if (!isMap(m1) || !isMap(m2)) throw new Error('Can only compare matrices');
-    if (m1.size !== m2.size) return false;
-    for (let [key, value] of m1.entries()) {
-        if (!m2.has(key) || m2.get(key) !== value) return false;
+export const isEqualMatrix = (matrix1, m2) => {
+    const matrix2 = m2.matrix;
+    if (!isMap(matrix1) || !isMap(matrix2)) throw new Error('Can only compare matrices');
+    if (matrix1.size !== matrix2.size) return false;
+    for (let [key, value] of matrix1.entries()) {
+        if (!matrix2.has(key) || matrix2.get(key) !== value) return false;
     }
     return true;
 };
@@ -103,7 +105,7 @@ export const getMean = (m, axis, index) => {
 
 export const transformByScalar = (matrix, scalar, operation) => {
     const isSafeType = isSafeNumber(scalar) || isSafeFloat(scalar);
-    if (!isMap(matrix) || !isSafeType) throw new Error('Can only transform matrix by safe number');
+    if (!isMap(matrix) || !isSafeType) throw new Error('Scalar must be safe number or float & matrix must be valid');
     const result = new Map();
     for (const [key, value] of matrix.entries()) {
         result.set(key, mathOperation(value, scalar, operation));
@@ -190,10 +192,11 @@ export const matrixCofactor = (matrix, rows, cols) => {
 };
 
 export const matrixInverse = (adjugate, determinant) => {
+    const a = adjugate.matrix;
     const inverse = new Map();
     if (determinant === 0 || !isSafeNumber(determinant)) throw new Error('Matrix is not invertible');
-    if (!isMap(adjugate)) throw new Error('Adjugate must be instance of matrix');
-    adjugate.forEach((value, key) => inverse.set(key, mathOperation(value, determinant, 'DIVIDE')));
+    if (!isMap(a)) throw new Error('Adjugate must be instance of matrix');
+    a.forEach((value, key) => inverse.set(key, mathOperation(value, determinant, 'DIVIDE')));
     return inverse;
 };
 
@@ -252,7 +255,7 @@ export const matrixDivide = (m1, m2, m1Config, m2Config) => {
         const det = matrixDeterminant(m2, m2Config.rows, m2Config.cols);
         if (det === 0) throw new Error("Cannot divide by a singular matrix (determinant is 0)");
         const co = matrixCofactor(m2, m2Config.rows, m2Config.cols);
-        const adjugate = matrixTranspose(co);
+        const adjugate = buildMatrix(matrixTranspose, {matrix: co, rows: m2Config.rows, cols: m2Config.cols});
         inverse = matrixInverse(adjugate, det);
     } else {
         // For non-square m2, compute the Moore–Penrose pseudoinverse.

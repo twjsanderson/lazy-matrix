@@ -43,6 +43,7 @@
   },
   "contributors": ["Tom"],
   "scripts": {
+    "start": "node index.js",
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint ."

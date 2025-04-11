@@ -272,12 +272,14 @@ describe('isEqualMatrix function', () => {
                 ['1,0', 74638],
                 ['1,1', 0.342]
             ]),
-            m2: new Map([
-                ['0,0', 100],
-                ['0,1', null],
-                ['1,0', 74638],
-                ['1,1', 0.342]
-            ]),
+            m2: {
+                matrix: new Map([
+                    ['0,0', 100],
+                    ['0,1', null],
+                    ['1,0', 74638],
+                    ['1,1', 0.342]
+                ]),
+            }
         }
     ];
     test('Should return correct matrix equality', () => {
@@ -770,8 +772,10 @@ describe('matrixInverse function', () => {
             const determinant = matrixDeterminant(initial.matrix, rows, cols);
             const coFactor = matrixCofactor(initial.matrix, rows, cols);
             const adjugate = matrixTranspose(coFactor);
+            const a = Matrix(rows, cols);
+            a.matrix = adjugate;
             return {
-                adjugate,
+                a,
                 determinant,
                 expected: expected.matrix
             }
@@ -779,8 +783,8 @@ describe('matrixInverse function', () => {
     ]
     test('Should return correct inverse matrix', () => {
         for (const cases of matrixInverseSuccesses) {
-            const { adjugate, determinant, expected } = cases();
-            expect(matrixInverse(adjugate, determinant)).toEqual(expected);
+            const { a, determinant, expected } = cases();
+            expect(matrixInverse(a, determinant)).toEqual(expected);
         }
     });
 });

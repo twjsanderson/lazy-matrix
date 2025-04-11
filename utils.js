@@ -2,7 +2,7 @@ import {
     MAX_SAFE_BIGINT, 
     MIN_SAFE_BIGINT,
     SAFE_MATRIX_SIZE,    
-} from './constants';
+} from './constants.js';
 
 // Conversions
 export const strToNum = (x) => Number.parseFloat(x);

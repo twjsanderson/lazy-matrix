@@ -13,7 +13,9 @@ import {
     getValue,
     deleteValue,
     Matrix,
+    buildMatrix
 } from '../matrix';
+import { matrixCofactor } from '../operations';
 
 
 describe('setMatrix function', () => {
@@ -437,5 +439,27 @@ describe('Matrix function', () => {
             expect(m[func]).toBeInstanceOf(Function);
         }
     });
+    test('Shold be new matrix with cofactor values', () => {
+        const m2 = Matrix(2, 2);
+        [
+            [0, 0, 1],
+            [0, 1, 2],
+            [1, 0, 4],
+            [1, 1, 5],
+        ].forEach(arr => m2.set(arr[0], arr[1], arr[2]));
+        const expected = Matrix(2, 2);
+        [
+            [0, 0, 5],
+            [0, 1, -4],
+            [1, 0, -2],
+            [1, 1, 1],
+        ].forEach(arr => expected.set(arr[0], arr[1], arr[2]));
+        const cofactorMatrix = buildMatrix(matrixCofactor, {matrix: m2.matrix, rows: 2, cols: 2});
+        for (const func of functionNames) {
+            expect(cofactorMatrix).toHaveProperty(func);
+            expect(Object.prototype.hasOwnProperty.call(cofactorMatrix, func)).toBe(true);
+            expect(cofactorMatrix[func]).toBeInstanceOf(Function);
+        }
+        expect(cofactorMatrix.matrix).toEqual(expected.matrix);
+    });
 });
-

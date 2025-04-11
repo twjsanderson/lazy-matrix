@@ -10,7 +10,7 @@ import {
     getByOperator,
     getMean,
     findByValue,
-} from './operations';
+} from './operations.js';
 import { 
     isArray, 
     isNumber, 
@@ -19,7 +19,7 @@ import {
     isSafeFloat, 
     isSafeMatrixLength,
     isObj,
-} from './utils';
+} from './utils.js';
 
 export const setMatrix = (rows, cols) => {
     const matrix = new Map();
@@ -75,6 +75,55 @@ export const getValue = (matrix, row, col) => {
     return isObj(value) ? value.num : value;
 }
 
+export const buildMatrix = (func, args) => {
+    const newMatrix = {
+        'matrixCofactor': () => {
+            const { matrix, rows, cols } = args;
+            const newMap = func(matrix, rows, cols);
+            const newMatrix = Matrix(rows, cols);
+            newMatrix.matrix = newMap;
+            return newMatrix;
+        },
+        'matrixTranspose': () => {
+            const { matrix, rows, cols } = args;
+            const newMap = func(matrix, rows);
+            const newMatrix = Matrix(rows, cols);
+            newMatrix.matrix = newMap;
+            return newMatrix;
+        },
+        'matrixInverse': () => {
+            const { adjugate, determinant, rows, cols } = args;
+            const newMap = func(adjugate, determinant);
+            const newMatrix = Matrix(rows, cols);
+            newMatrix.matrix = newMap;
+            return newMatrix;
+        },
+        'transformByScalar': () => {
+            const { matrix, scalar, type, rows, cols } = args;
+            const newMap = func(matrix, scalar, type);
+            const newMatrix = Matrix(rows, cols);
+            newMatrix.matrix = newMap;
+            return newMatrix;
+        },
+        'matrixMultiply': () => {
+            const { matrix, matrix2, rows, cols, matrix2Cols } = args;
+            const newMap = func(matrix, matrix2, rows, matrix2Cols);
+            const newMatrix = Matrix(rows, cols);
+            newMatrix.matrix = newMap;
+            return newMatrix;
+        },
+        'matrixDivide': () => {
+            const { matrix, matrix2, matrixConfig, matrix2Config } = args;
+            const { rows, cols } = matrixConfig;
+            const newMap = func(matrix, matrix2, matrixConfig, matrix2Config);
+            const newMatrix = Matrix(rows, cols);
+            newMatrix.matrix = newMap;
+            return newMatrix;
+        },
+    }
+    return newMatrix[func.name]();
+}
+
 export const Matrix = (r, c) => {
     const rows = setRows(r);
     const cols = setCols(c, rows);
@@ -91,17 +140,19 @@ export const Matrix = (r, c) => {
         min: () => getByOperator(matrix, 'MIN'),
         max: () => getByOperator(matrix, 'MAX'),
         mean: (axis, index) => getMean(matrix, axis, index),
-        transpose: () => matrixTranspose(matrix, rows),
         determinant: () => matrixDeterminant(matrix, rows, cols),
-        cofactor: () => matrixCofactor(matrix, rows, cols),
-        inverse: (adjugate, determinant) => matrixInverse(adjugate, determinant),
-        multiplyBy: (scalar) => transformByScalar(matrix, scalar, 'MULTIPLY'),
-        divideBy: (scalar) => transformByScalar(matrix, scalar, 'DIVIDE'),
-        addBy: (scalar) => transformByScalar(matrix, scalar, 'ADD'),
-        subtractBy: (scalar) => transformByScalar(matrix, scalar, 'SUBTRACT'),
-        moduloBy: (scalar) => transformByScalar(matrix, scalar, 'MOD'),
-        multiply: (m2) => matrixMultiply(matrix, m2.matrix, rows, m2.cols),
-        divide: (m2) => matrixDivide(matrix, m2.matrix, { rows, cols }, { rows: m2.rows, cols: m2.cols }),
+        
+        // Functions that return new Matrix
+        cofactor: () => buildMatrix(matrixCofactor, {matrix, rows, cols}),
+        transpose: () => buildMatrix(matrixTranspose, {matrix, rows, cols}),
+        inverse: (adjugate, determinant) => buildMatrix(matrixInverse, {adjugate, determinant, rows, cols}),
+        multiplyBy: (scalar) => buildMatrix(transformByScalar, {matrix, scalar, type: 'MULTIPLY', rows, cols}),
+        divideBy: (scalar) => buildMatrix(transformByScalar, {matrix, scalar, type: 'DIVIDE', rows, cols}),
+        addBy: (scalar) => buildMatrix(transformByScalar,{matrix, scalar, type: 'ADD', rows, cols}),
+        subtractBy: (scalar) => buildMatrix(transformByScalar, {matrix, scalar, type: 'SUBTRACT', rows, cols}),
+        moduloBy: (scalar) => buildMatrix(transformByScalar, {matrix, scalar, type: 'MOD', rows, cols}),
+        multiply: (m2) => buildMatrix(matrixMultiply, {matrix, matrix2: m2.matrix, rows, cols, matrix2Cols: m2.cols}),
+        divide: (m2) => buildMatrix(matrixDivide, {matrix, matrix2: m2.matrix, matrixConfig: { rows, cols }, matrix2Config: { rows: m2.rows, cols: m2.cols }}),
     };
     return Object.assign(properties, functions);
 };

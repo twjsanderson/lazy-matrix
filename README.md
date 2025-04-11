@@ -2,9 +2,7 @@
 
 A lightweight JavaScript library for generating, modifying, and performing operations on 2D matrices. 
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/twjsanderson/lazy-matrix/main/assets/lazy-programmer-on-the-beach.jpg" width="200" height="200" />
-</div>
+<img src="https://raw.githubusercontent.com/twjsanderson/lazy-matrix/main/assets/lazy-programmer-on-the-beach.jpg" width="200" height="200" />
 
 Designed for the 'lazy programmer', it allows you to mix **Numbers**, **Floats** and **BigInts** in a single matrix. 
 
